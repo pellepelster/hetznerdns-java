@@ -3,6 +3,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.sherter.google-java-format' version '0.8'
+    id 'maven-publish'
 }
 
 repositories {
