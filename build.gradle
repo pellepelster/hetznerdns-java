@@ -1,0 +1,45 @@
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '4.0.0'
+    id 'java'
+    id 'idea'
+    id 'com.github.sherter.google-java-format' version '0.8'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url "http://repo.spring.io/plugins-release/"
+    }
+}
+
+lombok {
+    sha256 = ""
+}
+
+group 'io.pelle.hetzner'
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+test {
+    testLogging {
+        events "started", "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
+}
+
+dependencies {
+    compile 'org.springframework:spring-web:5.1.9.RELEASE'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.10.4'
+    compile 'org.projectlombok:lombok:1.18.8'
+
+    testCompile 'junit:junit:4.12'
+    testCompile "com.github.tomakehurst:wiremock-jre8:2.26.3"
+    testCompile 'org.hamcrest:hamcrest:2.2'
+}
