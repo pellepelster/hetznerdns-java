@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RecordCreateRequest {
+public class RecordRequest {
   @JsonProperty("zone_id")
   private String zoneId;
 

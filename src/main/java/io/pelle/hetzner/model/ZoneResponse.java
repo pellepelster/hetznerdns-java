@@ -37,6 +37,8 @@ public class ZoneResponse {
   @JsonProperty("legacy_ns")
   private List<String> legacyNs;
 
+  private List<String> ns;
+
   @JsonProperty("records_count")
   private Integer recordscount;
 

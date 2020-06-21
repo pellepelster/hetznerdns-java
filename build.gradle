@@ -58,6 +58,7 @@ dependencies {
     compile 'org.springframework:spring-web:5.1.9.RELEASE'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.10.4'
     compile 'org.projectlombok:lombok:1.18.8'
+    compile 'org.slf4j:slf4j-api:1.7.25'
 
     testCompile 'junit:junit:4.12'
     testCompile "com.github.tomakehurst:wiremock-jre8:2.26.3"
