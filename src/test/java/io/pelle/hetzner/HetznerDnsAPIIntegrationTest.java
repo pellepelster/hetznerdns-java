@@ -1,11 +1,13 @@
 package io.pelle.hetzner;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.*;
 import static org.junit.Assert.assertThat;
 
 import io.pelle.hetzner.model.RecordRequest;
 import io.pelle.hetzner.model.RecordType;
 import io.pelle.hetzner.model.ZoneRequest;
+import java.util.Optional;
 import org.junit.Test;
 
 public class HetznerDnsAPIIntegrationTest {
@@ -22,14 +24,13 @@ public class HetznerDnsAPIIntegrationTest {
     assertThat(dnsApi.deleteZone("XXXXXXXSLaMsoTNyqrt4"), is(false));
 
     // clean up from previous tests if needed
-    dnsApi
-        .searchZone(INTEGRATION_TEST_ZONE_NAME)
+    Optional.ofNullable(dnsApi.searchZone(INTEGRATION_TEST_ZONE_NAME))
         .ifPresent(zone -> dnsApi.deleteZone(zone.getId()));
 
     var totalZones = dnsApi.getZones().size();
 
     // ensure 404 are handled gracefully
-    assertThat(dnsApi.searchZone(INTEGRATION_TEST_ZONE_NAME).isPresent(), is(false));
+    assertThat(dnsApi.searchZone(INTEGRATION_TEST_ZONE_NAME), nullValue());
     dnsApi.createZone(ZoneRequest.builder().name(INTEGRATION_TEST_ZONE_NAME).build());
 
     // we should now have one zone more in total
@@ -37,26 +38,25 @@ public class HetznerDnsAPIIntegrationTest {
 
     // verify created zone
     var zone = dnsApi.searchZone(INTEGRATION_TEST_ZONE_NAME);
-    assertThat(zone.isPresent(), is(true));
-    assertThat(zone.get().getName(), is(INTEGRATION_TEST_ZONE_NAME));
+    assertThat(zone.getName(), is(INTEGRATION_TEST_ZONE_NAME));
 
     // on no, the new zone has the wrong ttl, lets fix this
     dnsApi.updateZone(
-        zone.get().getId(), ZoneRequest.builder().name(INTEGRATION_TEST_ZONE_NAME).ttl(66).build());
+        zone.getId(), ZoneRequest.builder().name(INTEGRATION_TEST_ZONE_NAME).ttl(66).build());
 
     // verify updated zone
     zone = dnsApi.searchZone(INTEGRATION_TEST_ZONE_NAME);
-    assertThat(zone.get().getTtl(), is(66));
+    assertThat(zone.getTtl(), is(66));
 
     // check newly created zone has no records (not counting the SOA record)
-    assertThat(dnsApi.getRecords(zone.get().getId()).size(), is(1));
+    assertThat(dnsApi.getRecords(zone.getId()).size(), is(1));
 
     // add record to zone
     var newRecord1 =
         dnsApi.createRecord(
             RecordRequest.builder()
                 .name("xxx")
-                .zoneId(zone.get().getId())
+                .zoneId(zone.getId())
                 .type(RecordType.A)
                 .value("1.1.1.1")
                 .build());
@@ -64,7 +64,7 @@ public class HetznerDnsAPIIntegrationTest {
     assertThat(newRecord1.getValue(), is("1.1.1.1"));
 
     // check for newly created record (plus the default SOA record)
-    assertThat(dnsApi.getRecords(zone.get().getId()).size(), is(2));
+    assertThat(dnsApi.getRecords(zone.getId()).size(), is(2));
 
     // we made a mistake, lets try to update the record
     var updatedRecord1 =
@@ -72,7 +72,7 @@ public class HetznerDnsAPIIntegrationTest {
             newRecord1.getId(),
             RecordRequest.builder()
                 .name("xxx")
-                .zoneId(zone.get().getId())
+                .zoneId(zone.getId())
                 .type(RecordType.A)
                 .value("8.8.8.8")
                 .build());
@@ -83,21 +83,22 @@ public class HetznerDnsAPIIntegrationTest {
         dnsApi.createRecords(
             RecordRequest.builder()
                 .name("yyy")
-                .zoneId(zone.get().getId())
+                .zoneId(zone.getId())
                 .type(RecordType.A)
                 .value("2.2.2.2")
                 .build(),
             RecordRequest.builder()
                 .name("zzz")
-                .zoneId(zone.get().getId())
+                .zoneId(zone.getId())
                 .type(RecordType.A)
                 .value("3.3.3.3")
                 .build());
 
     // check for newly created records (plus the default SOA record)
-    assertThat(dnsApi.getRecords(zone.get().getId()).size(), is(4));
+    assertThat(dnsApi.getRecords(zone.getId()).size(), is(4));
 
     // clean up test zone
-    dnsApi.searchZone(INTEGRATION_TEST_ZONE_NAME).ifPresent(z -> dnsApi.deleteZone(z.getId()));
+    Optional.ofNullable(dnsApi.searchZone(INTEGRATION_TEST_ZONE_NAME))
+        .ifPresent(z -> dnsApi.deleteZone(z.getId()));
   }
 }

@@ -69,11 +69,12 @@ public class HetznerDnsAPI {
         .orElse(null);
   }
 
-  public Optional<ZoneResponse> searchZone(String name) {
+  public ZoneResponse searchZone(String name) {
     return request(
             "/zones?name=" + name, HttpMethod.GET, defaultHttpEntity, ListZonesResponse.class)
         .map(ListZonesResponse::getZones)
-        .flatMap(t -> t.stream().findFirst());
+        .flatMap(t -> t.stream().findFirst())
+        .orElse(null);
   }
 
   public List<ZoneResponse> getZones() {
