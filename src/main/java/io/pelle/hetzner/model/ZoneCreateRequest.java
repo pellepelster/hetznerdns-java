@@ -7,6 +7,5 @@ import lombok.Data;
 @Builder
 public class ZoneCreateRequest {
   private String name;
-
-  @Builder.Default private Integer ttl = 86400;
+  private Integer ttl;
 }
